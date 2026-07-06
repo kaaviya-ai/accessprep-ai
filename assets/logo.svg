@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="AccessPrep AI logo">
+  <rect width="512" height="512" rx="64" fill="#101418"/>
+  <path d="M104 334c48-112 99-168 152-168s104 56 152 168" fill="none" stroke="#8ab4f8" stroke-width="34" stroke-linecap="round"/>
+  <circle cx="256" cy="254" r="54" fill="#34a853"/>
+  <path d="M148 370h216" stroke="#fbbc04" stroke-width="30" stroke-linecap="round"/>
+  <path d="M256 88v54M256 370v54M88 256h54M370 256h54" stroke="#ea4335" stroke-width="22" stroke-linecap="round"/>
+</svg>
