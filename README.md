@@ -152,6 +152,18 @@ Then choose **Cloud Shell Web Preview -> Preview on port 8080**.
 
 Detailed steps are included in `demo/google_cloud_shell_demo.md`.
 
+## GitHub-Based Public Deployment
+
+GitHub Pages cannot host this project because AccessPrep AI is a Python Streamlit application. For a GitHub-connected public deployment, use Streamlit Community Cloud:
+
+1. Open https://share.streamlit.io/
+2. Sign in with GitHub.
+3. Choose repository `kaaviya-ai/accessprep-ai`.
+4. Choose branch `main`.
+5. Set main file path to `app.py`.
+6. Add `GEMINI_API_KEY` in Streamlit secrets.
+7. Deploy and use the generated public URL for submission.
+
 ## Submission Template Alignment
 
 This repository addresses the prototype submission deck requirements:
