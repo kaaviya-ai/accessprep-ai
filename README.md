@@ -135,6 +135,23 @@ Recommended Google Cloud services:
 - BigQuery for anonymized learning-event analytics.
 - Cloud Logging for monitoring.
 
+## No-Billing Google Cloud Demo Alternate
+
+If billing cannot be enabled, Cloud Run deployment will not proceed because Google Cloud requires billing for Artifact Registry and Cloud Build activation. For a no-payment live demo that still runs on Google Cloud infrastructure, use **Google Cloud Shell Web Preview**:
+
+```bash
+cd ~
+rm -rf accessprep-ai
+git clone https://github.com/kaaviya-ai/accessprep-ai.git
+cd accessprep-ai
+python3 -m pip install --user -r requirements.txt
+python3 -m streamlit run app.py --server.port 8080 --server.address 0.0.0.0 --server.headless true
+```
+
+Then choose **Cloud Shell Web Preview -> Preview on port 8080**.
+
+Detailed steps are included in `demo/google_cloud_shell_demo.md`.
+
 ## Submission Template Alignment
 
 This repository addresses the prototype submission deck requirements:
