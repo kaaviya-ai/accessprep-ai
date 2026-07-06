@@ -9,6 +9,19 @@ from prompts import EXPLAIN_PROMPT, QUIZ_PROMPT, RECOMMENDATION_PROMPT, SYSTEM_P
 from utils.config import gcp_location, gcp_project_id, get_gemini_api_key, use_vertex_ai
 
 
+DEFAULT_STUDY_TEXT = """Sample Competitive Exam Study Page
+Subject: Indian Polity | Topic: Fundamental Rights
+
+Fundamental Rights are basic rights guaranteed by the Constitution of India.
+They protect individual liberty, equality, religious freedom, and constitutional remedies.
+They are mainly listed in Part III, Articles 12 to 35.
+
+Article 14: Equality before law and equal protection of laws.
+Article 19: Freedom of speech, expression, movement, association, and profession.
+Article 21: Protection of life and personal liberty.
+Article 32: Right to constitutional remedies; called the heart and soul of the Constitution."""
+
+
 @dataclass
 class AIResult:
     ok: bool
@@ -40,6 +53,18 @@ class GeminiService:
         return direct_gemini or vertex_gemini
 
     def _offline(self, task: str, content: str = "") -> AIResult:
+        task_lower = task.lower()
+        content = content or DEFAULT_STUDY_TEXT
+        if "quiz" in task_lower or "mcq" in task_lower:
+            return self._offline_quiz(content)
+        if "summarize" in task_lower or "summary" in task_lower or "key point" in task_lower:
+            return self._offline_summary(content)
+        if "recommend" in task_lower or "study plan" in task_lower or "decision" in task_lower:
+            return self._offline_recommendation("Competitive Exam", 60, 3.0, 55, content)
+        if "question" in task_lower or "answer" in task_lower:
+            return self._offline_answer("Explain the most important exam point.", content)
+        if "explain" in task_lower or "generation" in task_lower:
+            return self._offline_explanation(content)
         preview = " ".join(content.split())[:380]
         text = (
             f"Offline demo mode: add GEMINI_API_KEY in .env for live Gemini responses.\n\n"
@@ -54,6 +79,7 @@ class GeminiService:
         return AIResult(ok=True, text=text, source="Offline demo mode")
 
     def _topic(self, content: str) -> str:
+        content = content or DEFAULT_STUDY_TEXT
         lowered = content.lower()
         if "fundamental rights" in lowered:
             return "Fundamental Rights"
@@ -63,6 +89,7 @@ class GeminiService:
         return first_line[:70] or "the uploaded study material"
 
     def _offline_explanation(self, content: str) -> AIResult:
+        content = content or DEFAULT_STUDY_TEXT
         topic = self._topic(content)
         text = (
             f"Offline demo explanation for {topic}.\n\n"
@@ -80,6 +107,7 @@ class GeminiService:
         return AIResult(True, text, "Offline demo AI")
 
     def _offline_summary(self, content: str) -> AIResult:
+        content = content or DEFAULT_STUDY_TEXT
         topic = self._topic(content)
         text = (
             f"Offline demo summary for {topic}.\n\n"
@@ -109,6 +137,7 @@ class GeminiService:
         return AIResult(True, text, "Offline demo AI")
 
     def _offline_answer(self, question: str, content: str) -> AIResult:
+        question = question.strip() or "Explain the most important exam point."
         text = (
             f"Offline demo answer for your question: {question}\n\n"
             "Based on the study material, focus on the article, its meaning, and why it matters in exams. "
@@ -139,29 +168,34 @@ class GeminiService:
         return AIResult(True, text, "Offline demo AI")
 
     def generate(self, prompt: str, content: str = "") -> AIResult:
+        content = content or DEFAULT_STUDY_TEXT
         if not self.available:
-            return self._offline("AI generation requested", content)
+            return self._offline(prompt, content)
         try:
             if self.vertex_enabled and gcp_project_id():
                 from vertexai.generative_models import GenerativeModel
 
                 model = GenerativeModel(self.model_name, system_instruction=[SYSTEM_PROMPT])
                 response = model.generate_content(prompt)
-                return AIResult(ok=True, text=(response.text or "").strip(), source=f"Vertex AI {self.model_name}")
+                text = (response.text or "").strip()
+                return AIResult(ok=True, text=text or self._offline_explanation(content).text, source=f"Vertex AI {self.model_name}")
             import google.generativeai as genai
 
             model = genai.GenerativeModel(self.model_name, system_instruction=SYSTEM_PROMPT)
             response = model.generate_content(prompt)
-            return AIResult(ok=True, text=(response.text or "").strip(), source=f"Gemini API {self.model_name}")
+            text = (response.text or "").strip()
+            return AIResult(ok=True, text=text or self._offline_explanation(content).text, source=f"Gemini API {self.model_name}")
         except Exception as exc:
             return AIResult(ok=False, text=f"Gemini error: {exc}", source=self.model_name)
 
     def explain(self, content: str) -> AIResult:
+        content = content or DEFAULT_STUDY_TEXT
         if not self.available:
             return self._offline_explanation(content)
         return self.generate(EXPLAIN_PROMPT.format(content=content), content)
 
     def summarize(self, content: str) -> AIResult:
+        content = content or DEFAULT_STUDY_TEXT
         if not self.available:
             return self._offline_summary(content)
         prompt = (
@@ -172,11 +206,13 @@ class GeminiService:
         return self.generate(prompt, content)
 
     def quiz(self, content: str) -> AIResult:
+        content = content or DEFAULT_STUDY_TEXT
         if not self.available:
             return self._offline_quiz(content)
         return self.generate(QUIZ_PROMPT.format(content=content), content)
 
     def answer_question(self, question: str, content: str) -> AIResult:
+        content = content or DEFAULT_STUDY_TEXT
         if not self.available:
             return self._offline_answer(question, content)
         prompt = (
@@ -187,6 +223,7 @@ class GeminiService:
         return self.generate(prompt, content)
 
     def recommend(self, exam: str, days_remaining: int, study_hours: float, current_score: int, content: str) -> AIResult:
+        content = content or DEFAULT_STUDY_TEXT
         if not self.available:
             return self._offline_recommendation(exam, days_remaining, study_hours, current_score, content)
         prompt = RECOMMENDATION_PROMPT.format(
