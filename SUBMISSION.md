@@ -2,7 +2,6 @@
 
 ## Deployment Link
 
-Use the public Streamlit Community Cloud URL after deployment.
 
 Recommended deployment platform:
 
@@ -24,16 +23,11 @@ https://github.com/kaaviya-ai/accessprep-ai
 
 ## Final Project PPT
 
-```text
-ppt/presentation.pptx
-```
-
 ## Demo Video Link
 
-Add the public video link here after uploading your under-3-minute demo video:
 
 ```text
-<PASTE_DEMO_VIDEO_LINK_HERE>
+(https://wilpbitspilaniacin0-my.sharepoint.com/:v:/g/personal/kaaviya_a_wilp_bits-pilani_ac_in/IQCFde5KAN2IQZx9gnNcA2UmAe4AaAPc-Vo6tqCEPF_85c4?e=XJiiEG)
 ```
 
 ## Brief Description
@@ -75,10 +69,3 @@ GEMINI_API_KEY = "your-gemini-api-key"
 
 8. Deploy the app and copy the public URL.
 
-## Competition Alignment
-
-- **Deployment**: Streamlit Community Cloud or Google Cloud Run-ready deployment.
-- **PPT**: `ppt/presentation.pptx`.
-- **GitHub**: public repository at https://github.com/kaaviya-ai/accessprep-ai.
-- **Demo video**: under 3 minutes, explaining upload, OCR, AI Tutor, recommendations, and speech output.
-- **Google Cloud readiness**: Dockerfile, Cloud Build config, Cloud Run service config, Gemini/Vertex AI readiness, Vision OCR, and optional BigQuery analytics.
