@@ -1,17 +1,8 @@
 import streamlit as st
 
+from components.speech import speech_controls
 from utils.analytics import log_learning_event
 from utils.gemini_client import GeminiService
-from utils.tts import text_to_speech
-
-
-def _speak_button(label: str, text: str, key: str) -> None:
-    if st.button(label, key=key):
-        try:
-            path = text_to_speech(text)
-            st.audio(path)
-        except Exception as exc:
-            st.warning(f"Text-to-speech could not run in this environment: {exc}")
 
 
 def render() -> None:
@@ -32,21 +23,31 @@ def render() -> None:
     with col3:
         quiz = st.button("Generate 5 MCQs")
 
-    if explain or summarize:
+    if explain:
         with st.spinner("Gemini is preparing an accessible explanation..."):
             result = service.explain(content)
         log_learning_event("tutor_explanation_generated", {"characters": len(content), "source": result.source})
         st.session_state["last_ai_response"] = result.text
-        st.markdown(result.text)
-        _speak_button("Convert explanation to speech", result.text, "speak-explain")
+        st.session_state["last_ai_label"] = "Convert explanation to speech"
+
+    if summarize:
+        with st.spinner("Preparing key points..."):
+            result = service.summarize(content)
+        log_learning_event("tutor_summary_generated", {"characters": len(content), "source": result.source})
+        st.session_state["last_ai_response"] = result.text
+        st.session_state["last_ai_label"] = "Convert summary to speech"
 
     if quiz:
         with st.spinner("Generating quiz questions..."):
             result = service.quiz(content)
         log_learning_event("quiz_generated", {"characters": len(content), "source": result.source})
         st.session_state["last_ai_response"] = result.text
-        st.markdown(result.text)
-        _speak_button("Convert quiz to speech", result.text, "speak-quiz")
+        st.session_state["last_ai_label"] = "Convert quiz to speech"
+
+    if st.session_state.get("last_ai_response"):
+        st.subheader("AI Response")
+        st.markdown(st.session_state["last_ai_response"])
+        speech_controls(st.session_state["last_ai_response"], st.session_state.get("last_ai_label", "Convert response to speech"), "tutor-response")
 
     st.divider()
     st.subheader("Ask a Follow-up Question")
@@ -66,3 +67,5 @@ def render() -> None:
                 result = service.answer_question(question, content)
             st.markdown(result.text)
         st.session_state["chat_messages"].append({"role": "assistant", "content": result.text})
+        st.session_state["last_ai_response"] = result.text
+        st.session_state["last_ai_label"] = "Convert answer to speech"

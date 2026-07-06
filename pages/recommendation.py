@@ -1,9 +1,9 @@
 import streamlit as st
 
+from components.speech import speech_controls
 from utils.analytics import log_learning_event
 from utils.gemini_client import GeminiService
 from utils.study_logic import rule_based_recommendation
-from utils.tts import text_to_speech
 
 
 def render() -> None:
@@ -38,8 +38,7 @@ def render() -> None:
 
         st.subheader("AI Recommendation")
         st.markdown(result.text)
-        if st.button("Convert plan to speech"):
-            try:
-                st.audio(text_to_speech(result.text))
-            except Exception as exc:
-                st.warning(f"Text-to-speech could not run in this environment: {exc}")
+        st.session_state["last_study_plan"] = result.text
+
+    if st.session_state.get("last_study_plan"):
+        speech_controls(st.session_state["last_study_plan"], "Convert plan to speech", "study-plan")
