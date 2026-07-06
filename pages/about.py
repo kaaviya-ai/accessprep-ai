@@ -1,12 +1,14 @@
 import streamlit as st
 
+from components.ui import responsive_image
+
 
 def render() -> None:
     st.title("About AccessPrep AI")
     st.markdown("AccessPrep AI helps visually impaired competitive exam aspirants convert inaccessible study material into explanations, quizzes, audio, and adaptive study decisions.")
 
     st.subheader("Architecture")
-    st.image("architecture.png", caption="AccessPrep AI Google Cloud architecture", width="stretch")
+    responsive_image("architecture.png", caption="AccessPrep AI Google Cloud architecture")
 
     st.subheader("Technology")
     st.write("Python, Streamlit, Gemini API, Google Vision OCR or Gemini Vision, gTTS, Pillow, PyMuPDF, Docker, Cloud Run.")

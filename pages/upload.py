@@ -1,6 +1,7 @@
 import streamlit as st
 from PIL import Image
 
+from components.ui import responsive_image
 from utils.analytics import log_learning_event
 from utils.ocr import extract_text_from_images, extract_text_from_pdf, load_pdf_pages, offline_demo_text, pdf_preview_message
 
@@ -40,7 +41,7 @@ def render() -> None:
 
     st.subheader("Preview")
     for idx, image in enumerate(images[:3], start=1):
-        st.image(image, caption=f"Page {idx}", width="stretch")
+        responsive_image(image, caption=f"Page {idx}")
 
     if st.button("Extract OCR Text", type="primary"):
         with st.spinner("Extracting accessible text..."):

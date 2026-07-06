@@ -1,6 +1,16 @@
 import streamlit as st
 
 
+def responsive_image(image, caption: str | None = None, width: int | None = None) -> None:
+    if width:
+        st.image(image, caption=caption, width=width)
+        return
+    try:
+        st.image(image, caption=caption, use_container_width=True)
+    except TypeError:
+        st.image(image, caption=caption, use_column_width=True)
+
+
 def inject_css() -> None:
     st.markdown(
         """
